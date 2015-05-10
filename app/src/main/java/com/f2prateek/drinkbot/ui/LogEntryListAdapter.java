@@ -26,12 +26,12 @@ import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
 
-final class DrinkListAdapter extends BaseAdapter implements Action1<List<LogEntry>> {
+final class LogEntryListAdapter extends BaseAdapter implements Action1<List<LogEntry>> {
   private final LayoutInflater inflater;
 
   private List<LogEntry> items = Collections.emptyList();
 
-  public DrinkListAdapter(Context context) {
+  public LogEntryListAdapter(Context context) {
     this.inflater = LayoutInflater.from(context);
   }
 

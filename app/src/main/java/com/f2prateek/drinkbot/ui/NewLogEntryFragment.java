@@ -39,10 +39,10 @@ import rx.subjects.PublishSubject;
 
 import static butterknife.ButterKnife.findById;
 
-public final class NewDrinkEntryFragment extends DialogFragment {
+public final class NewLogEntryFragment extends DialogFragment {
 
-  public static NewDrinkEntryFragment newInstance() {
-    return new NewDrinkEntryFragment();
+  public static NewLogEntryFragment newInstance() {
+    return new NewLogEntryFragment();
   }
 
   private final PublishSubject<String> createClicked = PublishSubject.create();

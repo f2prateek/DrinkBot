@@ -19,7 +19,7 @@ import dagger.Module;
 
 @Module(
     injects = {
-        DrinkListFragment.class, NewDrinkEntryFragment.class
+        LogEntryListFragment.class, NewLogEntryFragment.class
     },
     complete = false,
     library = true)

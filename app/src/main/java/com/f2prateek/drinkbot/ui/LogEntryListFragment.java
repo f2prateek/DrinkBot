@@ -41,15 +41,15 @@ import rx.schedulers.Schedulers;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_IF_ROOM;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
 
-public final class DrinkListFragment extends Fragment {
+public final class LogEntryListFragment extends Fragment {
   interface Listener {
     void onDrinkClicked(long id);
 
     void onNewDrinkClicked();
   }
 
-  static DrinkListFragment newInstance() {
-    return new DrinkListFragment();
+  static LogEntryListFragment newInstance() {
+    return new LogEntryListFragment();
   }
 
   @Inject LogEntry.Db db;
@@ -58,7 +58,7 @@ public final class DrinkListFragment extends Fragment {
   @InjectView(android.R.id.empty) View emptyView;
 
   private Listener listener;
-  private DrinkListAdapter adapter;
+  private LogEntryListAdapter adapter;
   private Subscription subscription;
 
   @Override public void onAttach(Activity activity) {
@@ -71,7 +71,7 @@ public final class DrinkListFragment extends Fragment {
     setHasOptionsMenu(true);
 
     listener = (Listener) activity;
-    adapter = new DrinkListAdapter(activity);
+    adapter = new LogEntryListAdapter(activity);
   }
 
   @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

@@ -18,13 +18,13 @@ package com.f2prateek.drinkbot.ui;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-public final class MainActivity extends FragmentActivity implements DrinkListFragment.Listener {
+public final class MainActivity extends FragmentActivity implements LogEntryListFragment.Listener {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
-          .add(android.R.id.content, DrinkListFragment.newInstance())
+          .add(android.R.id.content, LogEntryListFragment.newInstance())
           .commit();
     }
   }
@@ -41,6 +41,6 @@ public final class MainActivity extends FragmentActivity implements DrinkListFra
   }
 
   @Override public void onNewDrinkClicked() {
-    NewDrinkEntryFragment.newInstance().show(getSupportFragmentManager(), "new-drink");
+    NewLogEntryFragment.newInstance().show(getSupportFragmentManager(), "new-drink");
   }
 }
