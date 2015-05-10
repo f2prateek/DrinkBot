@@ -27,7 +27,7 @@ final class DbOpenHelper extends SQLiteOpenHelper {
       + "CREATE TABLE " + Drink.TABLE + "("
       + Drink.ID + " INTEGER NOT NULL PRIMARY KEY,"
       + Drink.VOLUME + " REAL NOT NULL,"
-      + Drink.DATE + " TEXT NOT NULL,"
+      + Drink.DATE + " DATETIME NOT NULL,"
       + Drink.DESCRIPTION + " TEXT"
       + ")";
 

@@ -18,13 +18,11 @@ package com.f2prateek.drinkbot.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import auto.parcel.AutoParcel;
-import com.squareup.sqlbrite.SqlBrite;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import rx.functions.Func1;
 
-// Note: normally I wouldn't prefix table classes but I didn't want 'List' to be overloaded.
 @AutoParcel
 public abstract class Drink {
   public static final String TABLE = "drink_list";
@@ -60,7 +58,6 @@ public abstract class Drink {
       cursor.close();
     }
   };
-
 
   public static final class Builder {
     private final ContentValues values = new ContentValues();
