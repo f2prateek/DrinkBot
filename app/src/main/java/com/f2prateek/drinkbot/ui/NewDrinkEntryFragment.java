@@ -27,8 +27,9 @@ import android.view.View;
 import android.widget.EditText;
 import com.f2prateek.drinkbot.R;
 import com.f2prateek.drinkbot.TodoApp;
-import com.f2prateek.drinkbot.db.TodoList;
+import com.f2prateek.drinkbot.db.Drink;
 import com.squareup.sqlbrite.SqlBrite;
+import java.util.Date;
 import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -39,9 +40,10 @@ import rx.subjects.PublishSubject;
 
 import static butterknife.ButterKnife.findById;
 
-public final class NewListFragment extends DialogFragment {
-  public static NewListFragment newInstance() {
-    return new NewListFragment();
+public final class NewDrinkEntryFragment extends DialogFragment {
+
+  public static NewDrinkEntryFragment newInstance() {
+    return new NewDrinkEntryFragment();
   }
 
   private final PublishSubject<String> createClicked = PublishSubject.create();
@@ -55,20 +57,22 @@ public final class NewListFragment extends DialogFragment {
 
   @NonNull @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
     final Context context = getActivity();
-    View view = LayoutInflater.from(context).inflate(R.layout.new_list, null);
+    View view = LayoutInflater.from(context).inflate(R.layout.new_item, null);
 
     EditText name = findById(view, android.R.id.input);
     Observable<OnTextChangeEvent> nameText = WidgetObservable.text(name);
 
     Observable.combineLatest(createClicked, nameText,
         (ignored, event) -> event.text().toString()) //
-        .subscribeOn(AndroidSchedulers.mainThread()) //
-        .observeOn(Schedulers.io()).subscribe(name1 -> {
-      db.insert(TodoList.TABLE, new TodoList.Builder().name(name1).build());
-    });
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(Schedulers.io())
+        .subscribe(description -> {
+          db.insert(Drink.TABLE,
+              new Drink.Builder().volume(341).description(description).date(new Date()).build());
+        });
 
     return new AlertDialog.Builder(context) //
-        .setTitle(R.string.new_list)
+        .setTitle(R.string.new_item)
         .setView(view)
         .setPositiveButton(R.string.create, (dialog, which) -> {
           createClicked.onNext("clicked");

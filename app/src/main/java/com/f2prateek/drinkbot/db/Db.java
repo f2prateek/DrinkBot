@@ -15,9 +15,16 @@
  */
 package com.f2prateek.drinkbot.db;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public final class Db {
+  @SuppressLint("SimpleDateFormat") public static final DateFormat ISO_8601_DATE_FORMAT =
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
   public static final int BOOLEAN_FALSE = 0;
   public static final int BOOLEAN_TRUE = 1;
 
@@ -31,6 +38,19 @@ public final class Db {
 
   public static long getLong(Cursor cursor, String columnName) {
     return cursor.getLong(cursor.getColumnIndexOrThrow(columnName));
+  }
+
+  public static double getDouble(Cursor cursor, String columnName) {
+    return cursor.getDouble(cursor.getColumnIndexOrThrow(columnName));
+  }
+
+  public static Date getDate(Cursor cursor, String columnName) {
+    String serializedDate = getString(cursor, columnName);
+    try {
+      return ISO_8601_DATE_FORMAT.parse(serializedDate);
+    } catch (ParseException e) {
+      throw new AssertionError("Date saved in invalid format: " + serializedDate);
+    }
   }
 
   public static int getInt(Cursor cursor, String columnName) {

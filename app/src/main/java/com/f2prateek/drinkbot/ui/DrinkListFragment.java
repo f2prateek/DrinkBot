@@ -32,6 +32,7 @@ import butterknife.InjectView;
 import butterknife.OnItemClick;
 import com.f2prateek.drinkbot.R;
 import com.f2prateek.drinkbot.TodoApp;
+import com.f2prateek.drinkbot.db.Drink;
 import com.squareup.sqlbrite.SqlBrite;
 import javax.inject.Inject;
 import rx.Subscription;
@@ -41,15 +42,15 @@ import rx.schedulers.Schedulers;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_IF_ROOM;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
 
-public final class ListsFragment extends Fragment {
+public final class DrinkListFragment extends Fragment {
   interface Listener {
-    void onListClicked(long id);
+    void onDrinkClicked(long id);
 
-    void onNewListClicked();
+    void onNewDrinkClicked();
   }
 
-  static ListsFragment newInstance() {
-    return new ListsFragment();
+  static DrinkListFragment newInstance() {
+    return new DrinkListFragment();
   }
 
   @Inject SqlBrite db;
@@ -58,7 +59,7 @@ public final class ListsFragment extends Fragment {
   @InjectView(android.R.id.empty) View emptyView;
 
   private Listener listener;
-  private ListsAdapter adapter;
+  private DrinkListAdapter adapter;
   private Subscription subscription;
 
   @Override public void onAttach(Activity activity) {
@@ -71,14 +72,14 @@ public final class ListsFragment extends Fragment {
     setHasOptionsMenu(true);
 
     listener = (Listener) activity;
-    adapter = new ListsAdapter(activity);
+    adapter = new DrinkListAdapter(activity);
   }
 
   @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
 
     MenuItem item = menu.add(R.string.new_list).setOnMenuItemClickListener(item1 -> {
-      listener.onNewListClicked();
+      listener.onNewDrinkClicked();
       return true;
     });
     MenuItemCompat.setShowAsAction(item, SHOW_AS_ACTION_IF_ROOM | SHOW_AS_ACTION_WITH_TEXT);
@@ -97,16 +98,17 @@ public final class ListsFragment extends Fragment {
   }
 
   @OnItemClick(android.R.id.list) void listClicked(long listId) {
-    listener.onListClicked(listId);
+    listener.onDrinkClicked(listId);
   }
 
   @Override public void onResume() {
     super.onResume();
 
-    getActivity().setTitle("To-Do");
+    getActivity().setTitle("Drinks");
 
-    subscription = db.createQuery(ListsItem.TABLES, ListsItem.QUERY)
-        .map(ListsItem.MAP)
+    subscription = db.createQuery(Drink.TABLE, Drink.LIST_ALL_QUERY)
+        .map(SqlBrite.Query::run)
+        .map(Drink.MAP)
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(adapter);

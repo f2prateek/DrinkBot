@@ -16,28 +16,26 @@
 package com.f2prateek.drinkbot.ui;
 
 import android.content.Context;
-import android.text.SpannableString;
-import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckedTextView;
-import com.f2prateek.drinkbot.db.TodoItem;
+import android.widget.TextView;
+import com.f2prateek.drinkbot.db.Drink;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
 
-final class ItemsAdapter extends BaseAdapter implements Action1<List<TodoItem>> {
+final class DrinkListAdapter extends BaseAdapter implements Action1<List<Drink>> {
   private final LayoutInflater inflater;
 
-  private List<TodoItem> items = Collections.emptyList();
+  private List<Drink> items = Collections.emptyList();
 
-  public ItemsAdapter(Context context) {
-    inflater = LayoutInflater.from(context);
+  public DrinkListAdapter(Context context) {
+    this.inflater = LayoutInflater.from(context);
   }
 
-  @Override public void call(List<TodoItem> items) {
+  @Override public void call(List<Drink> items) {
     this.items = items;
     notifyDataSetChanged();
   }
@@ -46,7 +44,7 @@ final class ItemsAdapter extends BaseAdapter implements Action1<List<TodoItem>> 
     return items.size();
   }
 
-  @Override public TodoItem getItem(int position) {
+  @Override public Drink getItem(int position) {
     return items.get(position);
   }
 
@@ -60,22 +58,12 @@ final class ItemsAdapter extends BaseAdapter implements Action1<List<TodoItem>> 
 
   @Override public View getView(int position, View convertView, ViewGroup parent) {
     if (convertView == null) {
-      convertView =
-          inflater.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false);
+      convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
     }
 
-    TodoItem item = getItem(position);
-    CheckedTextView textView = (CheckedTextView) convertView;
-    textView.setChecked(item.complete());
-
-    CharSequence description = item.description();
-    if (item.complete()) {
-      SpannableString spannable = new SpannableString(description);
-      spannable.setSpan(new StrikethroughSpan(), 0, description.length(), 0);
-      description = spannable;
-    }
-
-    textView.setText(description);
+    Drink item = getItem(position);
+    ((TextView) convertView).setText(item.description() + " (" + item.volume() + ") on " //
+        + item.date());
 
     return convertView;
   }

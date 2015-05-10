@@ -18,45 +18,49 @@ package com.f2prateek.drinkbot.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import auto.parcel.AutoParcel;
+import com.squareup.sqlbrite.SqlBrite;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import rx.functions.Func1;
 
-import static com.squareup.sqlbrite.SqlBrite.Query;
-
+// Note: normally I wouldn't prefix table classes but I didn't want 'List' to be overloaded.
 @AutoParcel
-public abstract class TodoItem {
-  public static final String TABLE = "todo_item";
+public abstract class Drink {
+  public static final String TABLE = "drink_list";
+
+  public static String LIST_ALL_QUERY = "SELECT * FROM " + Drink.TABLE;
 
   public static final String ID = "_id";
-  public static final String LIST_ID = "todo_list_id";
+  public static final String VOLUME = "volume";
+  public static final String DATE = "date";
   public static final String DESCRIPTION = "description";
-  public static final String COMPLETE = "complete";
 
   public abstract long id();
 
-  public abstract long listId();
+  public abstract double volume();
+
+  public abstract Date date();
 
   public abstract String description();
 
-  public abstract boolean complete();
-
-  public static final Func1<Query, List<TodoItem>> MAP = query -> {
-    Cursor cursor = query.run();
+  public static Func1<Cursor, List<Drink>> MAP = cursor -> {
     try {
-      List<TodoItem> values = new ArrayList<>(cursor.getCount());
+      List<Drink> values = new ArrayList<>(cursor.getCount());
+
       while (cursor.moveToNext()) {
         long id = Db.getLong(cursor, ID);
-        long listId = Db.getLong(cursor, LIST_ID);
+        double volume = Db.getDouble(cursor, VOLUME);
+        Date date = Db.getDate(cursor, DATE);
         String description = Db.getString(cursor, DESCRIPTION);
-        boolean complete = Db.getBoolean(cursor, COMPLETE);
-        values.add(new AutoParcel_TodoItem(id, listId, description, complete));
+        values.add(new AutoParcel_Drink(id, volume, date, description));
       }
       return values;
     } finally {
       cursor.close();
     }
   };
+
 
   public static final class Builder {
     private final ContentValues values = new ContentValues();
@@ -66,18 +70,18 @@ public abstract class TodoItem {
       return this;
     }
 
-    public Builder listId(long listId) {
-      values.put(LIST_ID, listId);
+    public Builder volume(double volume) {
+      values.put(VOLUME, volume);
+      return this;
+    }
+
+    public Builder date(Date date) {
+      values.put(DATE, Db.ISO_8601_DATE_FORMAT.format(date));
       return this;
     }
 
     public Builder description(String description) {
       values.put(DESCRIPTION, description);
-      return this;
-    }
-
-    public Builder complete(boolean complete) {
-      values.put(COMPLETE, complete);
       return this;
     }
 
