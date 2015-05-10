@@ -17,9 +17,9 @@ package com.f2prateek.drinkbot.ui;
 
 import android.database.Cursor;
 import auto.parcel.AutoParcel;
+import com.f2prateek.drinkbot.db.Db;
 import com.f2prateek.drinkbot.db.TodoItem;
 import com.f2prateek.drinkbot.db.TodoList;
-import com.f2prateek.drinkbot.todo.db.Db;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,21 +70,19 @@ abstract class ListsItem {
 
   abstract int itemCount();
 
-  static Func1<Query, List<ListsItem>> MAP = new Func1<Query, List<ListsItem>>() {
-    @Override public List<ListsItem> call(Query query) {
-      Cursor cursor = query.run();
-      try {
-        List<ListsItem> values = new ArrayList<>(cursor.getCount());
-        while (cursor.moveToNext()) {
-          long id = Db.getLong(cursor, TodoList.ID);
-          String name = Db.getString(cursor, TodoList.NAME);
-          int itemCount = Db.getInt(cursor, ITEM_COUNT);
-          values.add(new AutoParcel_ListsItem(id, name, itemCount));
-        }
-        return values;
-      } finally {
-        cursor.close();
+  static Func1<Query, List<ListsItem>> MAP = query -> {
+    Cursor cursor = query.run();
+    try {
+      List<ListsItem> values = new ArrayList<>(cursor.getCount());
+      while (cursor.moveToNext()) {
+        long id = Db.getLong(cursor, TodoList.ID);
+        String name = Db.getString(cursor, TodoList.NAME);
+        int itemCount = Db.getInt(cursor, ITEM_COUNT);
+        values.add(new AutoParcel_ListsItem(id, name, itemCount));
       }
+      return values;
+    } finally {
+      cursor.close();
     }
   };
 }

@@ -19,7 +19,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -35,8 +34,6 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.android.widget.OnTextChangeEvent;
 import rx.android.widget.WidgetObservable;
-import rx.functions.Action1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
@@ -64,30 +61,19 @@ public final class NewListFragment extends DialogFragment {
     Observable<OnTextChangeEvent> nameText = WidgetObservable.text(name);
 
     Observable.combineLatest(createClicked, nameText,
-        new Func2<String, OnTextChangeEvent, String>() {
-          @Override public String call(String ignored, OnTextChangeEvent event) {
-            return event.text().toString();
-          }
-        }) //
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(Schedulers.io())
-        .subscribe(new Action1<String>() {
-          @Override public void call(String name) {
-            db.insert(TodoList.TABLE, new TodoList.Builder().name(name).build());
-          }
-        });
+        (ignored, event) -> event.text().toString()) //
+        .subscribeOn(AndroidSchedulers.mainThread()) //
+        .observeOn(Schedulers.io()).subscribe(name1 -> {
+      db.insert(TodoList.TABLE, new TodoList.Builder().name(name1).build());
+    });
 
     return new AlertDialog.Builder(context) //
         .setTitle(R.string.new_list)
         .setView(view)
-        .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-          @Override public void onClick(DialogInterface dialog, int which) {
-            createClicked.onNext("clicked");
-          }
+        .setPositiveButton(R.string.create, (dialog, which) -> {
+          createClicked.onNext("clicked");
         })
-        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-          @Override public void onClick(DialogInterface dialog, int which) {
-          }
+        .setNegativeButton(R.string.cancel, (dialog, which) -> {
         })
         .create();
   }

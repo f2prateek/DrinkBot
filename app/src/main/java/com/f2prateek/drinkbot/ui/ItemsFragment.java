@@ -32,24 +32,20 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import com.f2prateek.drinkbot.R;
 import com.f2prateek.drinkbot.TodoApp;
+import com.f2prateek.drinkbot.db.Db;
 import com.f2prateek.drinkbot.db.TodoItem;
 import com.f2prateek.drinkbot.db.TodoList;
-import com.f2prateek.drinkbot.todo.db.Db;
 import com.squareup.sqlbrite.SqlBrite;
 import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.android.widget.OnItemClickEvent;
 import rx.android.widget.WidgetObservable;
 import rx.functions.Action1;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_IF_ROOM;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
-import static com.squareup.sqlbrite.SqlBrite.Query;
 
 public final class ItemsFragment extends Fragment {
   private static final String KEY_LIST_ID = "list_id";
@@ -114,13 +110,10 @@ public final class ItemsFragment extends Fragment {
   @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
 
-    MenuItem item = menu.add(R.string.new_item)
-        .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-          @Override public boolean onMenuItemClick(MenuItem item) {
-            listener.onNewItemClicked(getListId());
-            return true;
-          }
-        });
+    MenuItem item = menu.add(R.string.new_item).setOnMenuItemClickListener(item1 -> {
+      listener.onNewItemClicked(getListId());
+      return true;
+    });
     MenuItemCompat.setShowAsAction(item, SHOW_AS_ACTION_IF_ROOM | SHOW_AS_ACTION_WITH_TEXT);
   }
 
@@ -136,15 +129,11 @@ public final class ItemsFragment extends Fragment {
     listView.setAdapter(adapter);
 
     WidgetObservable.itemClicks(listView) //
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .observeOn(Schedulers.io())
-        .subscribe(new Action1<OnItemClickEvent>() {
-          @Override public void call(OnItemClickEvent event) {
-            boolean newValue = !adapter.getItem(event.position()).complete();
-            db.update(TodoItem.TABLE, new TodoItem.Builder().complete(newValue).build(),
-                TodoItem.ID + " = ?", String.valueOf(event.id()));
-          }
-        });
+        .subscribeOn(AndroidSchedulers.mainThread()).observeOn(Schedulers.io()).subscribe(event -> {
+      boolean newValue = !adapter.getItem(event.position()).complete();
+      db.update(TodoItem.TABLE, new TodoItem.Builder().complete(newValue).build(),
+          TodoItem.ID + " = ?", String.valueOf(event.id()));
+    });
   }
 
   @Override public void onResume() {
@@ -154,46 +143,37 @@ public final class ItemsFragment extends Fragment {
     subscriptions = new CompositeSubscription();
 
     Observable<Integer> itemCount = db.createQuery(TodoItem.TABLE, COUNT_QUERY, listId) //
-        .map(new Func1<Query, Integer>() {
-          @Override public Integer call(Query query) {
-            Cursor cursor = query.run();
-            try {
-              if (!cursor.moveToNext()) {
-                throw new AssertionError("No rows");
-              }
-              return cursor.getInt(0);
-            } finally {
-              cursor.close();
+        .map(query -> {
+          Cursor cursor = query.run();
+          try {
+            if (!cursor.moveToNext()) {
+              throw new AssertionError("No rows");
             }
+            return cursor.getInt(0);
+          } finally {
+            cursor.close();
           }
         });
-    Observable<String> listName =
-        db.createQuery(TodoList.TABLE, TITLE_QUERY, listId).map(new Func1<Query, String>() {
-          @Override public String call(Query query) {
-            Cursor cursor = query.run();
-            try {
-              if (!cursor.moveToNext()) {
-                throw new AssertionError("No rows");
-              }
-              return cursor.getString(0);
-            } finally {
-              cursor.close();
-            }
+    Observable<String> listName = db.createQuery(TodoList.TABLE, TITLE_QUERY, listId).map(query -> {
+      Cursor cursor = query.run();
+      try {
+        if (!cursor.moveToNext()) {
+          throw new AssertionError("No rows");
+        }
+        return cursor.getString(0);
+      } finally {
+        cursor.close();
+      }
+    });
+    subscriptions.add(Observable.combineLatest(listName, itemCount,
+        (listName1, itemCount1) -> listName1 + " (" + itemCount1 + ")")
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action1<String>() {
+          @Override public void call(String title) {
+            getActivity().setTitle(title);
           }
-        });
-    subscriptions.add(
-        Observable.combineLatest(listName, itemCount, new Func2<String, Integer, String>() {
-          @Override public String call(String listName, Integer itemCount) {
-            return listName + " (" + itemCount + ")";
-          }
-        })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<String>() {
-              @Override public void call(String title) {
-                getActivity().setTitle(title);
-              }
-            }));
+        }));
 
     subscriptions.add(db.createQuery(TodoItem.TABLE, LIST_QUERY, listId)
         .map(TodoItem.MAP)

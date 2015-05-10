@@ -18,7 +18,6 @@ package com.f2prateek.drinkbot.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import auto.parcel.AutoParcel;
-import com.f2prateek.drinkbot.todo.db.AutoParcel_TodoList;
 import java.util.ArrayList;
 import java.util.List;
 import rx.functions.Func1;
@@ -38,21 +37,19 @@ public abstract class TodoList {
 
   public abstract boolean archived();
 
-  public static Func1<Cursor, List<TodoList>> MAP = new Func1<Cursor, List<TodoList>>() {
-    @Override public List<TodoList> call(final Cursor cursor) {
-      try {
-        List<TodoList> values = new ArrayList<>(cursor.getCount());
+  public static Func1<Cursor, List<TodoList>> MAP = cursor -> {
+    try {
+      List<TodoList> values = new ArrayList<>(cursor.getCount());
 
-        while (cursor.moveToNext()) {
-          long id = Db.getLong(cursor, ID);
-          String name = Db.getString(cursor, NAME);
-          boolean archived = Db.getBoolean(cursor, ARCHIVED);
-          values.add(new AutoParcel_TodoList(id, name, archived));
-        }
-        return values;
-      } finally {
-        cursor.close();
+      while (cursor.moveToNext()) {
+        long id = Db.getLong(cursor, ID);
+        String name = Db.getString(cursor, NAME);
+        boolean archived = Db.getBoolean(cursor, ARCHIVED);
+        values.add(new AutoParcel_TodoList(id, name, archived));
       }
+      return values;
+    } finally {
+      cursor.close();
     }
   };
 

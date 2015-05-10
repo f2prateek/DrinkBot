@@ -34,11 +34,7 @@ public final class DbModule {
     SqlBrite db = SqlBrite.create(openHelper);
 
     if (BuildConfig.DEBUG) {
-      db.setLogger(new SqlBrite.Logger() {
-        @Override public void log(String message) {
-          Timber.tag("Database").v(message);
-        }
-      });
+      db.setLogger(message -> Timber.tag("Database").v(message));
       db.setLoggingEnabled(true);
     }
 

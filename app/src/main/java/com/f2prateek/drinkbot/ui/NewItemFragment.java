@@ -19,7 +19,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -92,14 +91,10 @@ public final class NewItemFragment extends DialogFragment {
     return new AlertDialog.Builder(context) //
         .setTitle(R.string.new_item)
         .setView(view)
-        .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
-          @Override public void onClick(DialogInterface dialog, int which) {
-            createClicked.onNext("clicked");
-          }
+        .setPositiveButton(R.string.create, (dialog, which) -> {
+          createClicked.onNext("clicked");
         })
-        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-          @Override public void onClick(DialogInterface dialog, int which) {
-          }
+        .setNegativeButton(R.string.cancel, (dialog, which) -> {
         })
         .create();
   }

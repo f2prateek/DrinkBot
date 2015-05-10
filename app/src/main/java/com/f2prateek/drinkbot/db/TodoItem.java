@@ -18,7 +18,6 @@ package com.f2prateek.drinkbot.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import auto.parcel.AutoParcel;
-import com.f2prateek.drinkbot.todo.db.AutoParcel_TodoItem;
 import java.util.ArrayList;
 import java.util.List;
 import rx.functions.Func1;
@@ -42,22 +41,20 @@ public abstract class TodoItem {
 
   public abstract boolean complete();
 
-  public static final Func1<Query, List<TodoItem>> MAP = new Func1<Query, List<TodoItem>>() {
-    @Override public List<TodoItem> call(Query query) {
-      Cursor cursor = query.run();
-      try {
-        List<TodoItem> values = new ArrayList<>(cursor.getCount());
-        while (cursor.moveToNext()) {
-          long id = Db.getLong(cursor, ID);
-          long listId = Db.getLong(cursor, LIST_ID);
-          String description = Db.getString(cursor, DESCRIPTION);
-          boolean complete = Db.getBoolean(cursor, COMPLETE);
-          values.add(new AutoParcel_TodoItem(id, listId, description, complete));
-        }
-        return values;
-      } finally {
-        cursor.close();
+  public static final Func1<Query, List<TodoItem>> MAP = query -> {
+    Cursor cursor = query.run();
+    try {
+      List<TodoItem> values = new ArrayList<>(cursor.getCount());
+      while (cursor.moveToNext()) {
+        long id = Db.getLong(cursor, ID);
+        long listId = Db.getLong(cursor, LIST_ID);
+        String description = Db.getString(cursor, DESCRIPTION);
+        boolean complete = Db.getBoolean(cursor, COMPLETE);
+        values.add(new AutoParcel_TodoItem(id, listId, description, complete));
       }
+      return values;
+    } finally {
+      cursor.close();
     }
   };
 

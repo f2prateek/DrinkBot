@@ -77,13 +77,10 @@ public final class ListsFragment extends Fragment {
   @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
 
-    MenuItem item = menu.add(R.string.new_list)
-        .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-          @Override public boolean onMenuItemClick(MenuItem item) {
-            listener.onNewListClicked();
-            return true;
-          }
-        });
+    MenuItem item = menu.add(R.string.new_list).setOnMenuItemClickListener(item1 -> {
+      listener.onNewListClicked();
+      return true;
+    });
     MenuItemCompat.setShowAsAction(item, SHOW_AS_ACTION_IF_ROOM | SHOW_AS_ACTION_WITH_TEXT);
   }
 
