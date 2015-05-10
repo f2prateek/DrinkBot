@@ -23,7 +23,7 @@ final class DbOpenHelper extends SQLiteOpenHelper {
   private static final int VERSION = 1;
 
   public DbOpenHelper(Context context) {
-    super(context, "drinks.db", null /* factory */, VERSION);
+    super(context, "drinkbot.db", null /* factory */, VERSION);
   }
 
   @Override public void onCreate(SQLiteDatabase db) {
