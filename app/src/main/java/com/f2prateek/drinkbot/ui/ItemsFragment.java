@@ -40,7 +40,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.android.widget.WidgetObservable;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -154,25 +153,24 @@ public final class ItemsFragment extends Fragment {
             cursor.close();
           }
         });
-    Observable<String> listName = db.createQuery(TodoList.TABLE, TITLE_QUERY, listId).map(query -> {
-      Cursor cursor = query.run();
-      try {
-        if (!cursor.moveToNext()) {
-          throw new AssertionError("No rows");
-        }
-        return cursor.getString(0);
-      } finally {
-        cursor.close();
-      }
-    });
+    Observable<String> listName = db.createQuery(TodoList.TABLE, TITLE_QUERY, listId) //
+        .map(query -> {
+          Cursor cursor = query.run();
+          try {
+            if (!cursor.moveToNext()) {
+              throw new AssertionError("No rows");
+            }
+            return cursor.getString(0);
+          } finally {
+            cursor.close();
+          }
+        });
     subscriptions.add(Observable.combineLatest(listName, itemCount,
         (listName1, itemCount1) -> listName1 + " (" + itemCount1 + ")")
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action1<String>() {
-          @Override public void call(String title) {
-            getActivity().setTitle(title);
-          }
+        .subscribe(title -> {
+          getActivity().setTitle(title);
         }));
 
     subscriptions.add(db.createQuery(TodoItem.TABLE, LIST_QUERY, listId)
