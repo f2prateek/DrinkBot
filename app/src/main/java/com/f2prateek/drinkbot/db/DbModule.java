@@ -26,6 +26,8 @@ import timber.log.Timber;
 
 @Module(complete = false, library = true)
 public final class DbModule {
+  private static final String DB_TAG = "Database";
+
   @Provides @Singleton SQLiteOpenHelper provideOpenHelper(Application application) {
     return new DbOpenHelper(application);
   }
@@ -34,7 +36,7 @@ public final class DbModule {
     SqlBrite db = SqlBrite.create(openHelper);
 
     if (BuildConfig.DEBUG) {
-      db.setLogger(message -> Timber.tag("Database").v(message));
+      db.setLogger(message -> Timber.tag(DB_TAG).v(message));
       db.setLoggingEnabled(true);
     }
 
