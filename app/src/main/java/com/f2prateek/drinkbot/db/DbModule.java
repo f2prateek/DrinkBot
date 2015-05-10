@@ -42,4 +42,8 @@ public final class DbModule {
 
     return db;
   }
+
+  @Provides @Singleton LogEntry.Db provideLogEntryTable(SqlBrite sqlBrite) {
+    return new LogEntry.Db(sqlBrite);
+  }
 }

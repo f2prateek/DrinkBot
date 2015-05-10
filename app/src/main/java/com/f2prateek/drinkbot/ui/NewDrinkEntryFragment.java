@@ -27,8 +27,7 @@ import android.view.View;
 import android.widget.EditText;
 import com.f2prateek.drinkbot.R;
 import com.f2prateek.drinkbot.TodoApp;
-import com.f2prateek.drinkbot.db.Drink;
-import com.squareup.sqlbrite.SqlBrite;
+import com.f2prateek.drinkbot.db.LogEntry;
 import java.util.Date;
 import javax.inject.Inject;
 import rx.Observable;
@@ -48,7 +47,7 @@ public final class NewDrinkEntryFragment extends DialogFragment {
 
   private final PublishSubject<String> createClicked = PublishSubject.create();
 
-  @Inject SqlBrite db;
+  @Inject LogEntry.Db db;
 
   @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
@@ -67,8 +66,7 @@ public final class NewDrinkEntryFragment extends DialogFragment {
         .subscribeOn(AndroidSchedulers.mainThread())
         .observeOn(Schedulers.io())
         .subscribe(description -> {
-          db.insert(Drink.TABLE,
-              new Drink.Builder().volume(341).description(description).date(new Date()).build());
+          db.insert(new LogEntry.Builder().volume(341).description(description).date(new Date()));
         });
 
     return new AlertDialog.Builder(context) //

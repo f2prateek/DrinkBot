@@ -21,21 +21,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import com.f2prateek.drinkbot.db.Drink;
+import com.f2prateek.drinkbot.db.LogEntry;
 import java.util.Collections;
 import java.util.List;
 import rx.functions.Action1;
 
-final class DrinkListAdapter extends BaseAdapter implements Action1<List<Drink>> {
+final class DrinkListAdapter extends BaseAdapter implements Action1<List<LogEntry>> {
   private final LayoutInflater inflater;
 
-  private List<Drink> items = Collections.emptyList();
+  private List<LogEntry> items = Collections.emptyList();
 
   public DrinkListAdapter(Context context) {
     this.inflater = LayoutInflater.from(context);
   }
 
-  @Override public void call(List<Drink> items) {
+  @Override public void call(List<LogEntry> items) {
     this.items = items;
     notifyDataSetChanged();
   }
@@ -44,7 +44,7 @@ final class DrinkListAdapter extends BaseAdapter implements Action1<List<Drink>>
     return items.size();
   }
 
-  @Override public Drink getItem(int position) {
+  @Override public LogEntry getItem(int position) {
     return items.get(position);
   }
 
@@ -61,7 +61,7 @@ final class DrinkListAdapter extends BaseAdapter implements Action1<List<Drink>>
       convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
     }
 
-    Drink item = getItem(position);
+    LogEntry item = getItem(position);
     ((TextView) convertView).setText(item.description() + " (" + item.volume() + ") on " //
         + item.date());
 

@@ -22,7 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public final class Db {
+public final class CursorUtils {
   @SuppressLint("SimpleDateFormat") public static final DateFormat ISO_8601_DATE_FORMAT =
       new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
   public static final int BOOLEAN_FALSE = 0;
@@ -57,7 +57,7 @@ public final class Db {
     return cursor.getInt(cursor.getColumnIndexOrThrow(columnName));
   }
 
-  private Db() {
+  private CursorUtils() {
     throw new AssertionError("No instances.");
   }
 }

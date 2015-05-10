@@ -32,8 +32,7 @@ import butterknife.InjectView;
 import butterknife.OnItemClick;
 import com.f2prateek.drinkbot.R;
 import com.f2prateek.drinkbot.TodoApp;
-import com.f2prateek.drinkbot.db.Drink;
-import com.squareup.sqlbrite.SqlBrite;
+import com.f2prateek.drinkbot.db.LogEntry;
 import javax.inject.Inject;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -53,7 +52,7 @@ public final class DrinkListFragment extends Fragment {
     return new DrinkListFragment();
   }
 
-  @Inject SqlBrite db;
+  @Inject LogEntry.Db db;
 
   @InjectView(android.R.id.list) ListView listView;
   @InjectView(android.R.id.empty) View emptyView;
@@ -106,9 +105,7 @@ public final class DrinkListFragment extends Fragment {
 
     getActivity().setTitle("Drinks");
 
-    subscription = db.createQuery(Drink.TABLE, Drink.LIST_ALL_QUERY)
-        .map(SqlBrite.Query::run)
-        .map(Drink.MAP)
+    subscription = db.entries()
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(adapter);
